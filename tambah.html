@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tambah Menu</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+    <link rel="stylesheet" href="vendors/bootstrap/css/bootstrap.min.css" />
+  </head>
+
+  <style>
+    body {
+      background: linear-gradient(to bottom right, #d4edda, #28a745);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+  </style>
+
+  <body>
+    <div class="container mt-5">
+      <h1 class="mb-4">Tambah Menu Baru</h1>
+      <form id="menuForm">
+        <div class="mb-3">
+          <label for="menuType" class="form-label">Jenis Menu</label>
+          <select id="menuType" class="form-select" required>
+            <option value="food">Makanan</option>
+            <option value="drink">Minuman</option>
+          </select>
+        </div>
+        <div class="mb-3">
+          <label for="menuName" class="form-label">Nama Menu</label>
+          <input type="text" id="menuName" class="form-control" required />
+        </div>
+        <div class="mb-3">
+          <label for="menuPrice" class="form-label">Harga Menu</label>
+          <input type="number" id="menuPrice" class="form-control" required />
+        </div>
+        <div class="mb-3">
+          <label for="menuImage" class="form-label">Gambar Menu</label>
+          <input type="text" id="menuImage" class="form-control" placeholder="Masukkan nama file gambar" />
+        </div>
+        <button type="submit" class="btn btn-primary">Tambah Menu</button>
+      </form>
+      <div id="responseMessage" class="mt-3"></div>
+    </div>
+
+    <script src="vendors/bootstrap/js/bootstrap.bundle.min.js"></script>
+  </body>
+  <script>
+    async function menuForm(event) {
+      event.preventDefault();
+      let type = document.getElementById("menuType").value;
+      let name = document.getElementById("menuName").value;
+      let price = parseInt(document.getElementById("menuPrice").value);
+      let image = document.getElementById("menuImage").value;
+
+      let result = await fetch(`/${type}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ nama: name, harga: price, gambar: image }),
+      });
+
+      if (!result.ok) {
+        alert("Gagal menambahkan menu");
+      } else {
+        alert("Menu berhasil ditambahkan");
+        window.location.href = `/${type}.html`; // Kembali ke halaman food atau drink sesuai jenis menu
+      }
+    }
+
+    let tambah = document.getElementById("menuForm");
+    tambah.addEventListener("submit", menuForm);
+  </script>
+</html>
