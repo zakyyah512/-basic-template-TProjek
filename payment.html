@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Halaman Pembayaran - Bakso Pakde</title>
+    <link rel="stylesheet" href="vendors/bootstrap/css/bootstrap.min.css" />
+  </head>
+
+  <style>
+    body {
+      background: linear-gradient(to bottom right, #d4edda, #28a745);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .payment-container {
+      background-color: white;
+      border-radius: 15px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      padding: 30px;
+      width: 400px;
+      text-align: center;
+    }
+
+    .payment-container h2 {
+      margin-bottom: 20px;
+      color: #28a745;
+    }
+
+    .payment-info {
+      font-size: 16px;
+      margin-bottom: 20px;
+      color: #555;
+    }
+
+    .barcode-img {
+      display: block;
+      margin: 10px auto;
+      max-width: 200px;
+    }
+
+    .struk {
+      background-color: #f7f7f7;
+      padding: 20px;
+      border-radius: 10px;
+      border: 1px solid #ddd;
+      margin-top: 20px;
+    }
+
+    .struk p {
+      margin: 5px 0;
+    }
+
+    #back-button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      font-size: 16px;
+      border: none;
+      border-radius: 5px;
+      background-color: #28a745;
+      color: white;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    #back-button:hover {
+      background-color: #218838;
+    }
+  </style>
+
+  <body>
+    <div class="payment-container">
+      <h2>Halaman Pembayaran</h2>
+      <div id="payment-info" class="payment-info"></div>
+      <div id="payment-struk" class="struk"></div>
+      <button id="back-button" class="btn btn-success">Selesai</button>
+    </div>
+
+    <script>
+      // Mendapatkan parameter 'paymentMethod' 'total' dan 'items' dari URL
+      const urlParams = new URLSearchParams(window.location.search);
+      const paymentMethod = urlParams.get("paymentMethod");
+      const totalAmount = parseFloat(urlParams.get("total"));
+      const cartItems = JSON.parse(decodeURIComponent(urlParams.get("items")));
+
+      let paymentInfo = document.getElementById("payment-info");
+      let paymentStruk = document.getElementById("payment-struk");
+
+      // Format angka ke dalam format Rupiah
+      function formatRupiah(angka) {
+        return `Rp ${angka.toLocaleString("id-ID")}`;
+      }
+
+      // Menampilkan informasi berdasarkan metode pembayaran
+      if (paymentMethod === "dana") {
+        paymentInfo.innerHTML = `<p>Silakan transfer ke nomor DANA berikut: <strong>081234567890</strong></p>`;
+        paymentStruk.innerHTML = `<p><strong>Ringkasan Pembayaran</strong></p>`;
+        cartItems.forEach((item) => {
+          paymentStruk.innerHTML += `<div class="item">
+                                     <span>${item.name}</span>
+                                     <span>${item.quantity} x ${formatRupiah(item.price)} = ${formatRupiah(item.quantity * item.price)}</span>
+                                     </div>`;
+        });
+        paymentStruk.innerHTML += `<p><strong>Total: ${formatRupiah(totalAmount)}</strong></p>`;
+      } else if (paymentMethod === "ovo") {
+        paymentInfo.innerHTML = `<p>Silakan transfer ke nomor OVO berikut: <strong>081234567890</strong></p>`;
+        paymentStruk.innerHTML = `<p><strong>Ringkasan Pembayaran</strong></p>`;
+        cartItems.forEach((item) => {
+          paymentStruk.innerHTML += `<div class="item">
+                                     <span>${item.name}</span>
+                                     <span>${item.quantity} x ${formatRupiah(item.price)} = ${formatRupiah(item.quantity * item.price)}</span>
+                                     </div>`;
+        });
+        paymentStruk.innerHTML += `<p><strong>Total: ${formatRupiah(totalAmount)}</strong></p>`;
+      } else if (paymentMethod === "qris") {
+        paymentInfo.innerHTML = `<p>Scan QR Code berikut untuk melakukan pembayaran: </p>
+                                 <div style="text-align: center;">                       
+                                  <img src="images/barcode1.jpg" alt="Barcode DANA" class="barcode-img" />
+                                </div>
+                                `;
+        paymentStruk.innerHTML = `<p><strong>Ringkasan Pembayaran</strong></p>`;
+        cartItems.forEach((item) => {
+          paymentStruk.innerHTML += `<div class="item">
+                                     <span>${item.name}</span>
+                                     <span>${item.quantity} x ${formatRupiah(item.price)} = ${formatRupiah(item.quantity * item.price)}</span>
+                                     </div>`;
+        });
+        paymentStruk.innerHTML += `<p><strong>Total: ${formatRupiah(totalAmount)}</strong></p>`;
+      } else if (paymentMethod === "tunai") {
+        paymentInfo.innerHTML = `<p>Silakan bayar langsung di kasir dengan uang tunai.</p>`;
+        paymentStruk.innerHTML = `<p><strong>Ringkasan Pembayaran</strong></p>`;
+        cartItems.forEach((item) => {
+          paymentStruk.innerHTML += `<div class="item">
+                                     <span>${item.name}</span>
+                                     <span>${item.quantity} x ${formatRupiah(item.price)} = ${formatRupiah(item.quantity * item.price)}</span>
+                                     </div>`;
+        });
+        paymentStruk.innerHTML += `<p><strong>Total: ${formatRupiah(totalAmount)}</strong></p>`;
+      } else {
+        paymentInfo.innerHTML = `<p>Metode pembayaran tidak valid.</p>`;
+      }
+
+      // Tambahkan event listener untuk tombol
+      const backButton = document.getElementById("back-button");
+      backButton.addEventListener("click", () => {
+        window.location.href = "main.html"; // Arahkan ke halaman main.html
+      });
+    </script>
+  </body>
+</html>
