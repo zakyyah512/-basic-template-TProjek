@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Kelola Menu Admin - Bakso Pakde</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+    <link rel="stylesheet" href="vendors/bootstrap/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="vendors/boxicons/css/boxicons.min.css" />
+    <link rel="stylesheet" href="menu.css" />
+  </head>
+  <body id="food-page">
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg shadow-sm fixed-top">
+      <div class="container">
+        <a class="navbar-brand" href="#">Bakso Pakde</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNavDropdown">
+          <ul class="navbar-nav ms-auto">
+            <li class="nav-item"><a class="nav-link" href="main.html">Home</a></li>
+            <li class="nav-item"><a class="nav-link" href="food.html">Makanan</a></li>
+            <li class="nav-item"><a class="nav-link" href="drink.html">Minuman</a></li>
+            <li class="nav-item">
+              <a class="nav-link" href="tambah.html"> <i class="bx bxs-food-menu"></i></a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+    <!-- End Navbar -->
+
+    <!-- Menu card -->
+    <div class="menu-card">
+      <div class="container">
+        <h2 class="section-title">Food Menu</h2>
+        <div class="row" id="food-data">
+          <!-- Food Data -->
+        </div>
+        <h2 class="section-title">Drink Menu</h2>
+        <div class="row" id="drink-data">
+          <!-- Drink Data -->
+        </div>
+      </div>
+    </div>
+    <!-- Menu card end -->
+
+    <!-- Edit Modal -->
+    <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="editModalLabel">Edit Menu Item</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <form id="editForm">
+              <input type="hidden" id="edit-id" />
+              <input type="hidden" id="edit-type" />
+              <div class="mb-3">
+                <label for="edit-name" class="form-label">Name</label>
+                <input type="text" class="form-control" id="edit-name" required />
+              </div>
+              <div class="mb-3">
+                <label for="edit-price" class="form-label">Price</label>
+                <input type="text" class="form-control" id="edit-price" required />
+              </div>
+              <div class="mb-3">
+                <label for="edit-image" class="form-label">Image</label>
+                <input type="text" class="form-control" id="edit-image" required />
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary" onclick="saveEdit()">Save changes</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- End Edit Modal -->
+
+    <script src="vendors/bootstrap/js/bootstrap.bundle.min.js"></script>
+  </body>
+  <script>
+    async function loadFoodMenu() {
+      const foodData = document.getElementById("food-data");
+      try {
+        const response = await fetch("/food");
+        if (!response.ok) throw new Error("Failed to fetch food data");
+        const foodItems = await response.json();
+        renderMenuItems(foodData, foodItems, "food");
+      } catch (error) {
+        console.error("Error loading food menu:", error);
+        foodData.innerHTML = `<p class="text-danger">Failed to load food menu</p>`;
+      }
+    }
+
+    // Fetch and render Drink Menu
+    async function loadDrinkMenu() {
+      const drinkData = document.getElementById("drink-data");
+      try {
+        const response = await fetch("/drink");
+        if (!response.ok) throw new Error("Failed to fetch drink data");
+        const drinkItems = await response.json();
+        renderMenuItems(drinkData, drinkItems, "drink");
+      } catch (error) {
+        console.error("Error loading drink menu:", error);
+        drinkData.innerHTML = `<p class="text-danger">Failed to load drink menu</p>`;
+      }
+    }
+
+    // Render menu items
+    function renderMenuItems(container, items, type) {
+      container.innerHTML = "";
+      if (items.length > 0) {
+        items.forEach((item) => {
+          container.innerHTML += `
+              <div class="col-md-3 py-3 py-md-0">
+                <div class="card">
+                  <img src="images/${item.gambar}" alt="${item.nama}" />
+                  <div class="card-body">
+                    <h3 class="card-title">${item.nama}</h3>
+                    <p class="price">${item.harga}</p>
+                    <button class="btn btn-primary btn-sm" onclick="editMenu('${type}', ${item.id}, '${item.nama}', '${item.harga}', '${item.gambar}')">Edit</button>
+                    <button class="btn btn-danger btn-sm" onclick="deleteMenu('${type}', ${item.id})">Hapus</button>
+                    <button class="btn btn-light border btn-sm" onclick="addToFavorite(${item.id}, '${item.nama}', '${item.harga}', '${item.gambar}')"><i class="fa fa-heart text-danger"></i></button>
+                    </div>
+                </div>
+              </div>`;
+        });
+      } else {
+        container.innerHTML = `<p class="text-warning">No items available in the ${type} menu.</p>`;
+      }
+    }
+
+    // Open Edit Modal
+    function editMenu(type, id, name, price, image) {
+      document.getElementById("edit-id").value = id;
+      document.getElementById("edit-type").value = type;
+      document.getElementById("edit-name").value = name;
+      document.getElementById("edit-price").value = price;
+      document.getElementById("edit-image").value = image;
+      const editModal = new bootstrap.Modal(document.getElementById("editModal"));
+      editModal.show();
+    }
+
+    // Save Edit Changes
+    async function saveEdit() {
+      const id = document.getElementById("edit-id").value;
+      const type = document.getElementById("edit-type").value;
+      const name = document.getElementById("edit-name").value;
+      const price = document.getElementById("edit-price").value;
+      const image = document.getElementById("edit-image").value;
+
+      try {
+        const response = await fetch(`/${type}/${id}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ nama: name, harga: price, gambar: image }),
+        });
+        if (response.ok) {
+          alert("Menu item updated successfully");
+          if (type === "food") loadFoodMenu();
+          else if (type === "drink") loadDrinkMenu();
+        } else {
+          alert("Failed to update menu item");
+        }
+      } catch (error) {
+        console.error("Error updating menu item:", error);
+        alert("An error occurred while updating the menu item");
+      }
+
+      const editModal = bootstrap.Modal.getInstance(document.getElementById("editModal"));
+      editModal.hide();
+    }
+
+    // Delete menu item
+    async function deleteMenu(type, menuId) {
+      // Tampilkan konfirmasi sebelum menghapus
+      const confirmation = confirm("Yakin ingin menghapus menu ini?");
+
+      if (confirmation) {
+        try {
+          const response = await fetch(`/${type}/${menuId}`, { method: "DELETE" });
+          if (response.ok) {
+            alert("Menu item deleted successfully");
+            if (type === "food") loadFoodMenu();
+            else if (type === "drink") loadDrinkMenu();
+          } else {
+            alert("Failed to delete menu item");
+          }
+        } catch (error) {
+          console.error("Error deleting menu item:", error);
+          alert("An error occurred while deleting the menu item");
+        }
+      } else {
+        // Jika memilih tidak
+        alert("Penghapusan menu dibatalkan");
+      }
+    }
+
+    // Fungsi untuk menambahkan menu ke favorit
+    function addToFavorite(id, name, price, image) {
+      const favorites = JSON.parse(localStorage.getItem("favorites")) || [];
+      const item = { id, nama: name, harga: price, gambar: image };
+      favorites.push(item);
+      localStorage.setItem("favorites", JSON.stringify(favorites));
+      alert(`${name} added to your favorites!`);
+      window.location.href = `main.html`;
+    }
+
+    // Load menus on page load
+    loadFoodMenu();
+    loadDrinkMenu();
+  </script>
+</html>
