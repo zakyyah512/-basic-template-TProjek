@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Bakso Pakde</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+    <link rel="stylesheet" href="vendors/bootstrap/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="vendors/boxicons/css/boxicons.min.css" />
+    <link rel="stylesheet" href="main.css" />
+  </head>
+  <body id="main-page">
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg shadow-sm fixed-top">
+      <div class="container">
+        <a class="navbar-brand" href="#">Bakso Pakde</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNavDropdown">
+          <ul class="navbar-nav ms-auto">
+            <li class="nav-item"><a class="nav-link" href="#food-menu">Food Menu</a></li>
+            <li class="nav-item"><a class="nav-link" href="#menu-favorit">Menu Favorit</a></li>
+            <li class="nav-item">
+              <a class="nav-link" href="kelolaMenu.html"> <i class="bx bxs-food-menu"></i></a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link cart-icon" href="#" onclick="toggleSidebar()"> <i class="fa-solid fa-cart-shopping"></i><span>0</span> </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+    <!-- End Navbar -->
+
+    <!-- Cover -->
+    <section class="cover">
+      <div class="cover-overlay">
+        <h1>Bakso Pakde</h1>
+      </div>
+    </section>
+    <!-- End  -->
+
+    <!-- Menu -->
+    <section id="food-menu" class="food-menu">
+      <h2 class="section-header">Food Menu</h2>
+      <div class="menu-list">
+        <!-- makanan -->
+        <div class="row text-center">
+          <div class="col-md-6 mb-4">
+            <div class="service-item shadow-sm p-4 rounded bg-success-subtle">
+              <a href="food.html">
+                <div class="icon my-3 text-black fs-2">
+                  <i class="bx bxs-bowl-hot"></i>
+                </div>
+              </a>
+              <h3>Makanan</h3>
+            </div>
+          </div>
+          <!-- minuman -->
+          <div class="col-md-6 mb-4">
+            <div class="service-item shadow-sm p-4 rounded bg-success-subtle">
+              <a href="drink.html">
+                <div class="icon my-3 text-black fs-2">
+                  <i class="bx bxs-drink"></i>
+                </div>
+              </a>
+              <h3>Minuman</h3>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- End Menu -->
+
+    <!-- Menu Items -->
+    <section id="menu-favorit">
+      <div class="section-header text-center">
+        <h2>Menu Favorit</h2>
+      </div>
+      <div class="container">
+        <div class="row" id="favorite-menu">
+          <!--  Tempat data -->
+        </div>
+      </div>
+    </section>
+    <!-- End Menu Items -->
+
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <h3>My Cart</h3>
+        <button class="sidebar-close"><i class="fa-solid fa-close"></i></button>
+      </div>
+      <div class="cart-items"></div>
+      <div class="sidebar-footer">
+        <div class="total-amount">
+          <h5>Total</h5>
+          <div class="cart-total">0.00</div>
+        </div>
+        <div class="payment-method">
+          <h5>Metode Pembayaran</h5>
+          <select id="paymentMethod" class="payment-select">
+            <option value="dana">DANA</option>
+            <option value="ovo">OVO</option>
+            <option value="qris">QRIS</option>
+            <option value="tunai">Tunai</option>
+          </select>
+        </div>
+        <button class="checkout-btn">Bayar</button>
+      </div>
+    </div>
+    <!-- End Sidebar -->
+
+    <script src="main.js"></script>
+    <script src="vendors/bootstrap/js/bootstrap.bundle.min.js"></script>
+  </body>
+
+  <script>
+    function loadFavoriteMenu() {
+      const favoriteMenu = document.getElementById("favorite-menu");
+      const favorites = JSON.parse(localStorage.getItem("favorites")) || [];
+      favoriteMenu.innerHTML = ""; // Bersihkan kontainer terlebih dahulu
+
+      if (favorites.length > 0) {
+        favorites.forEach((item) => {
+          favoriteMenu.innerHTML += `
+                <div class="card ">
+                  <img src="images/${item.gambar}" class="card-img-top" alt="${item.nama}" />
+                  <div class="card-body text-center">
+                    <h5 class="card-title">${item.nama}</h5>
+                      <div class="card-price">
+                        <div class="price">${item.harga}</div>
+                          </div>
+                        <button class="btn btn-light border" onclick="removeFromFavorite(${item.id})">
+                          <i class="fa fa-heart text-danger"></i>
+                      </button>
+                        <i class="fa-solid fa-plus add-to-cart"></i>
+                  </div>
+                </div>`;
+        });
+      } else {
+        favoriteMenu.innerHTML = '<p class="text-center text-warning">Belum ada menu favorit</p>';
+      }
+    }
+
+    // Fungsi untuk menghapus dari favorit
+    function removeFromFavorite(id) {
+      // Tampilkan konfirmasi sebelum menghapus
+      const confirmation = confirm("Menu akan dihapus dari favorite");
+
+      if (confirmation) {
+        let favorites = JSON.parse(localStorage.getItem("favorites")) || [];
+        favorites = favorites.filter((item) => item.id !== id);
+        localStorage.setItem("favorites", JSON.stringify(favorites));
+        loadFavoriteMenu(); // Refresh daftar favorit
+      }
+    }
+
+    // Memuat menu favorit saat halaman dimuat
+    loadFavoriteMenu();
+  </script>
+</html>
